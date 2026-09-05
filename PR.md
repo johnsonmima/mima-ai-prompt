@@ -103,6 +103,16 @@ git tag -a v1.1.0 -m "v1.1.0"
 git push origin v1.1.0
 ```
 
+```
+git checkout main
+git pull origin main
+
+git tag -d v1.0.0
+git tag -a v1.0.0 -m "mima-ai-prompt 1.0.0"
+
+git push origin refs/tags/v1.0.0
+```
+
 3. Pushing the tag starts `.github/workflows/release.yml`, which tests, builds, and uploads to PyPI using Trusted Publishing (OIDC). Prerequisites are in [GITHUB.md](GITHUB.md).
 
 You can also rehearse with **Actions → Release → Run workflow** and `dry_run=true` (default). Set `dry_run=false` only to publish without a new tag.
@@ -117,3 +127,4 @@ You can also rehearse with **Actions → Release → Run workflow** and `dry_run
 6. Push and open PR into `main`.
 7. Wait for CI; squash-merge.
 8. For a PyPI release, merge a version bump first, then push tag `vX.Y.Z`.
+
