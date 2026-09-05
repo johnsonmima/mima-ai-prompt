@@ -1,0 +1,97 @@
+# Continuous Integration — mima-ai-prompt
+#
+# Why: open-source consumers and contributors need an automated, transparent
+# gate that proves every PR installs cleanly, passes tests with coverage,
+# and builds a valid wheel/sdist before merge.
+#
+# Triggers: push to main / release branches, and all pull requests.
+
+name: CI
+
+on:
+  push:
+    branches: [main, master, 'v*']
+  pull_request:
+    branches: [main, master, 'v*']
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_SYSTEM_PYTHON: 0
+  CI: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Stage: TEST (matrix of supported Python versions)
+  # ---------------------------------------------------------------------------
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Sync dependencies (locked)
+        run: uv sync --locked --all-groups
+
+      - name: Run tests with coverage (≥ 95% line)
+        run: >
+          uv run pytest
+          --cov=mima_ai_prompt
+          --cov-report=term-missing
+          --cov-report=xml:coverage/coverage.xml
+          --cov-fail-under=95
+
+      - name: Upload coverage report
+        if: always() && matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  # ---------------------------------------------------------------------------
+  # Stage: PACK — prove wheel/sdist build (publish is release.yml only)
+  # ---------------------------------------------------------------------------
+  pack:
+    name: Pack
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Sync and build
+        run: |
+          uv sync --locked --all-groups
+          uv build -o ./dist
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-packages
+          path: ./dist/
+          retention-days: 14

@@ -10,7 +10,7 @@ A typed, fluent **prompt engineering** library for Python. Build, validate, and 
 
 Python counterpart of [.NET Mima.AI.Prompt](https://www.nuget.org/packages/Mima.AI.Prompt) — same domain model and parts-first JSON shape.
 
-**Repository:** https://github.com/johnsonmima/mima-ai-prompt
+**Repository:** <https://github.com/johnsonmima/mima-ai-prompt>
 
 ## Why mima-ai-prompt?
 
@@ -51,20 +51,20 @@ class AppPrompts:
 
 api_prompt = (
     PromptBuilder.use(AppPrompts.SupportAgent)
-    .with_("product", "Billing")
+    .useWith("product", "Billing")
     .add_user("Why was I charged twice?")
     .build()
 )
 
 job_prompt = (
     PromptBuilder.use(AppPrompts.SupportAgent)
-    .with_("product", "Shipping")
+    .useWith("product", "Shipping")
     .add_user(ticket_body)
     .build()
 )
 ```
 
-`with` is a Python keyword, so variables use `.with_(name, value)`.
+`with` is a Python keyword, so template variables use `.useWith(name, value)`.
 
 `PromptSerializer().serialize(api_prompt)` stores the body as **`parts`**. In Python, `message.content` is that same text joined into one string for logging and tests; it is not a second JSON field.
 
@@ -103,9 +103,9 @@ for name in template.variables:
 
 prompt = (
     PromptBuilder.use(SystemTemplates.Configurable)
-    .with_("profession", "Teacher")
-    .with_("tone", "Friendly")
-    .with_("maxWords", "200")
+    .useWith("profession", "Teacher")
+    .useWith("tone", "Friendly")
+    .useWith("maxWords", "200")
     .add_user("Explain generics in Python")
     .build()
 )
@@ -121,7 +121,7 @@ check = template.validate({"profession": "Teacher"})
 # Raises PromptValidationException — never reaches your HTTP client
 prompt = (
     PromptBuilder.use(template)
-    .with_("profession", "Teacher")
+    .useWith("profession", "Teacher")
     .add_user("Hello")
     .build()
 )
@@ -200,6 +200,8 @@ uv add mima-ai-prompt
 pip install mima-ai-prompt
 ```
 
+Install the PyPI name `mima-ai-prompt`. Import the module as `mima_ai_prompt` (hyphens are not valid in Python import names).
+
 ## Development
 
 ```bash
@@ -208,7 +210,7 @@ uv run pytest --cov=mima_ai_prompt --cov-fail-under=95
 uv build
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md), [PR.md](PR.md), and [GITHUB.md](GITHUB.md) for CI, release, and PyPI Trusted Publishing.
+See [CONTRIBUTING.md](CONTRIBUTING.md), [PR.md](PR.md), and [GITHUB.md](GITHUB.md) for CI, release, and Trusted Publishing.
 
 ## License
 
