@@ -1,0 +1,49 @@
+name: Bug report
+description: Report a defect in mima-ai-prompt
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. Security issues → see SECURITY.md (private reporting).
+  - type: textarea
+    id: describe
+    attributes:
+      label: Describe the bug
+      description: Clear and concise description of what is wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Minimal sample. Use `from mima_ai_prompt import ...` (not `mima-ai-prompt`).
+      render: python
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: python
+    attributes:
+      label: Python version
+      options:
+        - "3.10"
+        - "3.11"
+        - "3.12"
+        - "3.13"
+        - multiple / other
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
